@@ -1,0 +1,332 @@
+{
+  "name": "微信单群聊自动总结工作流推送网页版（finished）",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 18
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -160,
+        80
+      ],
+      "id": "207c7b3e-bf93-48cf-9156-dd2dd1617107",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c2a2eec2-4ead-4544-83db-73aba917f553",
+              "name": "group_name",
+              "value": "汉为-麒麟系统民版沟通群",
+              "type": "string"
+            },
+            {
+              "id": "6dab17d2-2e5e-40e3-b5d9-0abcdac0dde8",
+              "name": "date",
+              "value": "={{ '2025-08-30'}} - {{ '2025-08-31' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        64,
+        80
+      ],
+      "id": "4b931414-cb1f-45c6-8186-4d4e30658512",
+      "name": "配置群聊参数"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=搜索 {{ $('配置群聊参数').item.json.group_name }} 群聊 {{ $('配置群聊参数').item.json.date }} 记录，并生成完整的HTML格式日报\n\n群组: {{ $('配置群聊参数').item.json.group_name }}\n日期: {{ $('配置群聊参数').item.json.date }}\n\n输出格式：完整的HTML文档代码",
+        "options": {
+          "systemMessage": "=# 微信群聊日报生成器\n\n你是极具审美的前端设计大师和群聊分析专家，专门为群聊记录生成视觉引人入胜、布局紧凑无空隙、配色和谐统一、风格固定一致、适合截图分享的单页HTML日报。\n\n## 重要：工具使用要求\n- 你必须使用chatlog工具来获取聊天记录\n- 不能假设或模拟聊天数据\n- 每次任务都要先调用chatlog工具\n\n## 可用工具\n你有以下MCP工具可用：\n- **chatlog**: 获取历史聊天记录\n\n## 核心任务\n1. **使用chatlog工具获取指定的群聊记录**\n2. **详细分析群聊内容并提炼关键信息**\n3. **生成基于Bento Grid设计风格的单页HTML网站**\n\n## 工作流程\n1. 根据用户提供的查询条件，调用chatlog工具获取聊天记录\n2. 分析聊天记录，提取关键信息\n3. 生成完整的HTML格式群聊日报\n\n## 自动提取信息能力\n- 群名称：从聊天记录的系统通知或常见群聊信息中提取\n- 日期：使用聊天记录中最近的日期，或者默认使用今天的日期  \n- 时间范围：根据记录中的首条和末条消息时间确定\n- 支持多种聊天记录格式：[时间] 昵称：消息内容、时间 - 昵称：消息内容等\n\n## 日报内容结构（必须包含）\n### 群聊总结\n- 群聊内容概述\n- 消息数量、活跃人员数量、热点话题数量\n- 统计时间\n\n### 今日热点（3-4个主要话题）\n- 关键词提取\n- 消息数量统计\n- 关键词提及次数\n- 突出显示微信名\n\n### 精彩引用（3条代表性发言）\n- 突出显示微信名\n- 有影响力或代表性的发言\n\n### 重要链接与资源\n- 链接支持点击跳转\n- 整理分享的文档和工具\n\n### 活跃之星（按发言次数倒序）\n- 发言次数统计\n- 人员前加@标识\n- 主要贡献内容描述\n- 突出显示微信名\n\n### 词云\n- 高频关键词可视化\n- 按重要性分级显示\n\n## 设计风格要求\n采用**极简主义风格 (Minimalist)**：\n- 简约、留白、精确排版、无衬线字体、克制装饰\n- 白色背景，橘色字体作为强调色\n- 配色方案：\n  - 背景色：#f5f4ee（略暖的米白色）\n  - 卡片背景：#faf9f6\n  - 强调色：#ff8906（主要橙色）\n  - 文字色：#212529（主要文字）\n\n## 布局技术要求\n### Bento Grid设计\n- 采用动态且无缝的网格布局，确保整个视口区域被高效利用\n- 主卡片展示核心概念（占25-30%视觉区域）\n- 子主题卡片包含不同话题，每个卡片有独特标题和简短描述\n- 严格定义卡片尺寸和比例，避免因内容多少导致布局变化\n\n### 视觉平衡\n- 确保色彩分布均匀，避免超过4种色系\n- 图标和视觉元素均匀分布\n- 文本密度相对均衡\n- 卡片形状可变化但保持视觉一致性\n\n### 技术实现\n- 单个HTML文件，内嵌CSS和JavaScript\n- 使用CSS变量定义所有颜色和尺寸\n- 使用CSS Grid实现不规则网格布局\n- 优化页面确保在单视口中完整显示，适合截图\n- 页面宽度100%，最大宽度1000px\n- 优先纵向布局，适合移动端截图分享\n\n### 字体要求\n- 使用Inter, SF Pro Display, Segoe UI字体\n- 主标题≥36px，副标题≥28px，卡片标题≥22px\n- 正文≥16px，标签≥14px\n- 使用相对单位(rem)适应不同设备\n\n### 颜色对比要求\n- 确保颜色对比度足够高\n- 避免使用过多颜色，保持3-4种以内\n- 文字和背景对比清晰，可读性高\n\n## 处理原则\n- 客观分析，不添加主观判断\n- 保护用户隐私，适当处理敏感信息\n- 提取有价值的技术讨论内容\n- 忽略无意义的闲聊和大量系统消息\n- 除专业名词外，其他输出内容要求中文\n- 确保生成的日报具有参考价值\n\n## 输出要求\n必须输出完整的HTML文档，包含：\n1. 完整的HTML结构\n2. 内嵌CSS样式（基于提供的模板）\n3. JavaScript交互功能\n4. Mermaid图表支持\n5. 响应式设计\n6. Font Awesome图标\n7. 动画效果\n8.你的唯一任务是生成代码。不要添加任何评论、解释或介绍性文字。你的回答必须直接以 <!DOCTYPE html> 开头，并以 </html> 结尾。\n\n严格按照极简主义风格生成，确保每次输出的页面风格完全一致。\n\n## 重要提示\n当用户提供查询条件时，你必须：\n1. 首先使用chatlog工具获取相应的聊天记录\n2. 分析获取到的聊天数据\n3. 然后生成完整的HTML格式群聊日报"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        320,
+        80
+      ],
+      "id": "14b86f9c-0bd8-4106-8095-9827b162f4d9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('配置群聊参数').item.json.date }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        336,
+        304
+      ],
+      "id": "5a726e86-a9dd-4edb-9af1-a9214c3567b3",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "content": "## Chatlog MCP",
+        "height": 180,
+        "width": 300,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        448,
+        272
+      ],
+      "id": "b62f65ce-eff1-4968-9b96-b3c2e76bf068",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 获取AI Agent的输出\nlet aiOutput;\ntry {\n  // 首先检查输入数据结构\n  const inputData = $input.first().json;\n  console.log('Input data structure:', JSON.stringify(inputData, null, 2));\n  \n  // 尝试不同的数据结构路径\n  if (inputData.choices && inputData.choices[0] && inputData.choices[0].message) {\n    // OpenAI API 标准格式\n    aiOutput = inputData.choices[0].message.content;\n  } else if (inputData.message && inputData.message.content) {\n    // 简化的消息格式\n    aiOutput = inputData.message.content;\n  } else if (inputData.content) {\n    // 直接内容格式\n    aiOutput = inputData.content;\n  } else if (inputData.output) {\n    // 输出字段格式\n    aiOutput = inputData.output;\n  } else if (typeof inputData === 'string') {\n    // 纯字符串格式\n    aiOutput = inputData;\n  } else {\n    // 如果都找不到，尝试找到第一个字符串值\n    const findStringValue = (obj) => {\n      if (typeof obj === 'string') return obj;\n      if (Array.isArray(obj)) {\n        for (const item of obj) {\n          const result = findStringValue(item);\n          if (result) return result;\n        }\n      } else if (typeof obj === 'object' && obj !== null) {\n        for (const key in obj) {\n          const result = findStringValue(obj[key]);\n          if (result) return result;\n        }\n      }\n      return null;\n    };\n    \n    aiOutput = findStringValue(inputData);\n    \n    if (!aiOutput) {\n      throw new Error('无法在输入数据中找到AI输出内容');\n    }\n  }\n  \n  console.log('Found AI output:', aiOutput.substring(0, 200) + '...');\n  \n} catch (error) {\n  console.error('获取AI输出时出错:', error);\n  return [{\n    json: {\n      error: '无法获取AI输出: ' + error.message,\n      inputData: $input.first().json,\n      status: 'error'\n    }\n  }];\n}\n\n// 清理可能的markdown标记\nlet htmlContent = aiOutput;\nif (htmlContent.includes('```html')) {\n  htmlContent = htmlContent.replace(/```html\\n?/g, '').replace(/\\n?```/g, '');\n}\nif (htmlContent.includes('```')) {\n  htmlContent = htmlContent.replace(/```\\n?/g, '').replace(/\\n?```/g, '');\n}\n\n// 获取群聊名称和日期（从工作流输入或设置默认值）\nconst groupName = $('配置群聊参数')?.item?.json?.group_name || 'unknown';\nconst date = $('配置群聊参数')?.item?.json?.date || new Date().toISOString().split('T')[0];\n\nconsole.log('群聊信息:', { groupName, date });\n\n// 🔥 改进：智能HTML内容清理 - 保护图表和脚本内容\nconsole.log('开始HTML清理，原始长度:', htmlContent.length);\n\n// 智能清理HTML内容，保护重要的代码区域\nconst smartCleanHtmlForMCP = (html) => {\n  // 1. 首先保护重要的代码区域\n  const protectedSections = [];\n  let cleanedHtml = html;\n  \n  // 保护 script 标签内容（包括 mermaid, chart.js 等）\n  cleanedHtml = cleanedHtml.replace(/<script[^>]*>[\\s\\S]*?<\\/script>/gi, (match, offset) => {\n    const placeholder = `__PROTECTED_SCRIPT_${protectedSections.length}__`;\n    protectedSections.push(match);\n    return placeholder;\n  });\n  \n  // 保护 style 标签内容\n  cleanedHtml = cleanedHtml.replace(/<style[^>]*>[\\s\\S]*?<\\/style>/gi, (match, offset) => {\n    const placeholder = `__PROTECTED_STYLE_${protectedSections.length}__`;\n    protectedSections.push(match);\n    return placeholder;\n  });\n  \n  // 保护 pre 标签内容（可能包含图表定义）\n  cleanedHtml = cleanedHtml.replace(/<pre[^>]*>[\\s\\S]*?<\\/pre>/gi, (match, offset) => {\n    const placeholder = `__PROTECTED_PRE_${protectedSections.length}__`;\n    protectedSections.push(match);\n    return placeholder;\n  });\n  \n  // 保护具有特殊class的div（如mermaid图表容器）\n  cleanedHtml = cleanedHtml.replace(/<div[^>]*class=\"[^\"]*(?:mermaid|chart|graph|diagram)[^\"]*\"[^>]*>[\\s\\S]*?<\\/div>/gi, (match, offset) => {\n    const placeholder = `__PROTECTED_CHART_${protectedSections.length}__`;\n    protectedSections.push(match);\n    return placeholder;\n  });\n  \n  // 2. 对其余内容进行清理\n  cleanedHtml = cleanedHtml\n    // 只清理普通的换行符和制表符，但保留必要的格式\n    .replace(/[\\r]/g, '')           // 移除回车符\n    .replace(/\\n\\s*\\n/g, '\\n')      // 将多个换行合并为一个\n    .replace(/\\t/g, '  ')           // 将制表符转换为两个空格\n    // 清理HTML标签间的多余空格，但不影响文本内容\n    .replace(/>\\s+</g, '><')\n    // 清理行首行尾空格\n    .replace(/^\\s+|\\s+$/gm, '')\n    // 将多个连续空格合并，但保留单个换行\n    .replace(/ +/g, ' ');\n  \n  // 3. 恢复受保护的内容\n  protectedSections.forEach((section, index) => {\n    const scriptPlaceholder = `__PROTECTED_SCRIPT_${index}__`;\n    const stylePlaceholder = `__PROTECTED_STYLE_${index}__`;\n    const prePlaceholder = `__PROTECTED_PRE_${index}__`;\n    const chartPlaceholder = `__PROTECTED_CHART_${index}__`;\n    \n    cleanedHtml = cleanedHtml.replace(scriptPlaceholder, section);\n    cleanedHtml = cleanedHtml.replace(stylePlaceholder, section);\n    cleanedHtml = cleanedHtml.replace(prePlaceholder, section);\n    cleanedHtml = cleanedHtml.replace(chartPlaceholder, section);\n  });\n  \n  // 4. 最后只对JSON传输做必要的转义\n  return cleanedHtml\n    .replace(/\\\\/g, '\\\\\\\\')    // 转义反斜杠\n    .replace(/\"/g, '\\\"');     // 转义双引号\n};\n\n// 应用智能清理\nconst originalHtmlContent = htmlContent;\nhtmlContent = smartCleanHtmlForMCP(htmlContent);\n\nconsole.log('智能HTML清理完成');\nconsole.log('- 原始长度:', originalHtmlContent.length);\nconsole.log('- 清理后长度:', htmlContent.length);\nconsole.log('- 节省空间:', originalHtmlContent.length - htmlContent.length, 'bytes');\n\n// 检查是否包含图表相关内容\nconst hasCharts = originalHtmlContent.match(/(mermaid|chart\\.js|echarts|d3\\.js|plotly|canvas|svg)/i);\nif (hasCharts) {\n  console.log('✅ 检测到图表内容，已应用保护性清理');\n} else {\n  console.log('ℹ️ 未检测到图表内容');\n}\n\n// 验证HTML文档完整性\nif (!htmlContent.includes('<!DOCTYPE html>')) {\n  console.error('AI输出不是完整的HTML文档');\n  return [{\n    json: {\n      error: 'AI输出不是完整的HTML文档',\n      receivedContent: htmlContent.substring(0, 500),\n      status: 'error'\n    }\n  }];\n}\n\n// 额外的HTML内容验证\nconst validateHtml = (html) => {\n  const checks = {\n    hasDoctype: html.includes('<!DOCTYPE html>'),\n    hasHtmlTag: html.includes('<html') && html.includes('</html>'),\n    hasHeadTag: html.includes('<head') && html.includes('</head>'),\n    hasBodyTag: html.includes('<body') && html.includes('</body>'),\n    hasTitle: html.includes('<title'),\n    isNotEmpty: html.length > 100,\n    hasChartLibraries: /(?:mermaid|chart\\.js|echarts|d3\\.js|plotly)/i.test(html)\n  };\n  \n  const passed = Object.values(checks).filter(Boolean).length;\n  const total = Object.keys(checks).length;\n  \n  console.log('HTML验证结果:', checks);\n  console.log(`HTML质量评分: ${passed}/${total}`);\n  \n  return { checks, score: passed / total };\n};\n\nconst validation = validateHtml(htmlContent);\n\n// 生成文件名 - 使用群聊名称和日期\nconst filename = `群聊日报-${groupName}-${date}.html`;\nconst safeFilename = filename.replace(/[^a-z0-9\\u4e00-\\u9fa5_\\-\\.]/gi, '_');\n\nconsole.log('文件名生成:', { \n  original: filename, \n  safe: safeFilename,\n  groupName: groupName,\n  date: date \n});\n\n// 生成清理后的HTML用于MCP工具\nconst mcpReadyHtml = htmlContent;\n\n// 计算处理时长\nlet processDuration = null;\ntry {\n  const startTime = $now;\n  if (startTime) {\n    const startDate = new Date(startTime);\n    const endDate = new Date();\n    // 计算秒数差\n    processDuration = Math.round((endDate - startDate) / 1000);\n  }\n} catch (e) {\n  console.log('计算处理时长失败:', e.message);\n  processDuration = null;\n}\n\n\n// 返回处理结果 - 包含两个版本的HTML\nreturn [{\n  json: {\n    // 原始HTML（用于文件保存）\n    htmlContent: originalHtmlContent,\n    // 清理后的HTML（用于MCP工具调用）\n    mcpHtmlContent: mcpReadyHtml,\n    // 文件信息 - 使用群聊名称\n    filename: safeFilename,\n    originalFilename: filename,\n    groupName: groupName,\n    date: date,\n    process_end_time: $now.toISO(),\n    process_duration: processDuration,\n    timestamp: new Date().toISOString(),\n    status: 'success',\n    // 统计信息\n    originalContentLength: originalHtmlContent.length,\n    cleanedContentLength: mcpReadyHtml.length,\n    compressionRatio: ((originalHtmlContent.length - mcpReadyHtml.length) / originalHtmlContent.length * 100).toFixed(2) + '%',\n    // HTML质量信息\n    htmlValidation: validation,\n    hasChartContent: hasCharts !== null,\n    // 调试信息\n    processingSteps: [\n      '✅ AI输出解析成功',\n      '✅ Markdown清理完成', \n      '✅ 智能HTML清理完成（保护图表）',\n      '✅ MCP格式优化完成',\n      `✅ HTML验证完成 (${(validation.score * 100).toFixed(1)}%)`,\n      `✅ 文件名生成完成: ${safeFilename}`\n    ]\n  },\n  binary: {\n    data: {\n      data: Buffer.from(originalHtmlContent, 'utf8').toString('base64'),\n      mimeType: 'text/html',\n      fileName: safeFilename,\n      fileExtension: 'html'\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        80
+      ],
+      "id": "0c9eac79-388d-4fb8-82ef-20219e4c2d96",
+      "name": "处理AI输出"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ 'https://api.github.com/repos/fanwenzhu/tigerAI-blog/contents/static/wechat-daily-report-' + $now.format('yyyy-MM-dd') + '.html' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "token {{ $credentials.gitHubApi.accessToken }}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/vnd.github.v3+json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "Auto deploy wechat daily report {{ $now.format('yyyy-MM-dd HH:mm:ss') }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $('处理AI输出').item.binary.data.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        976,
+        80
+      ],
+      "id": "a0bed1ff-bcbc-4046-8c18-f68eb0d732ee",
+      "name": "GitHub Pages部署",
+      "credentials": {
+        "githubApi": {
+          "id": "uRc08iwCkl10PJHn",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        192,
+        288
+      ],
+      "id": "1aa14cb8-c244-402b-aa5d-d8b0cf3fa586",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UypBpLuuOXcCRYHJ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 微信单群聊自动总结工作流推送网页版\n## author：tiger\n## 公众号：老虎聊AI\ndescription：自动定时总结单个微信群的群聊记录，时间可以自己设置，最后的输出结果推送到GitHub的pages（一个免费的静态网页托管平台），支持在线浏览。\n访问地址：https://fanwenzhu.github.io/tigerAI-blog/wechat-daily-report-2025-09-01.html   (日期改成当前日期)\n### 注意事项：\n1、工作流中的AI agent节点的凭证需要换成自己的凭证\n2、微信群聊的名称需要调整“配置群聊参数”节点中的微信群\n3、定时总结的时间需要调整“定时触发器”节点中的时间\n4、chatlog MCP节点中的sse endpoint目前使用的是docker里的网络，因为我是用docker部署的n8n实例，如果你是源码部署的话，需要修改",
+        "height": 384,
+        "width": 496
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        -320
+      ],
+      "id": "3637fb77-5631-4bc9-b173-b198ddc7318a",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "http://host.docker.internal:5030/sse",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        608,
+        336
+      ],
+      "id": "3c5aba2b-62ac-4c35-85d1-8ef91b122c13",
+      "name": "Chatlog MCP Client"
+    }
+  ],
+  "pinData": {
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2025-08-05T02:27:48.843-04:00",
+          "Readable date": "August 5th 2025, 2:27:48 am",
+          "Readable time": "2:27:48 am",
+          "Day of week": "Tuesday",
+          "Year": "2025",
+          "Month": "August",
+          "Day of month": "05",
+          "Hour": "02",
+          "Minute": "27",
+          "Second": "48",
+          "Timezone": "America/New_York (UTC-04:00)"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "配置群聊参数",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "配置群聊参数": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "处理AI输出",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "处理AI输出": {
+      "main": [
+        [
+          {
+            "node": "GitHub Pages部署",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chatlog MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "executionTimeout": 3600,
+    "timezone": "UTC"
+  },
+  "versionId": "86975ab7-7083-4141-a618-e966d15dcd8e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3a9f1808fd9411cdad9f0600c716c707a044601d01fa7c58b647a22ed7dd15bf"
+  },
+  "id": "hOAKIclq6hMbs4pH",
+  "tags": [
+    {
+      "createdAt": "2025-08-04T09:38:30.407Z",
+      "updatedAt": "2025-08-04T09:38:30.407Z",
+      "id": "rrh9xQ75GLF9lSh8",
+      "name": "微信自动化"
+    }
+  ]
+}
