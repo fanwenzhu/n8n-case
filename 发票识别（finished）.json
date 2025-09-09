@@ -1,0 +1,192 @@
+{
+  "name": "发票识别（finished）",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "07152206-0ba2-42c5-a400-5d6b05707992",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.textin.com/ai/service/v1/bill_recognize_v2",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-ti-app-id",
+              "value": "321d9d633b603489070010698852ea27"
+            },
+            {
+              "name": "x-ti-secret-code",
+              "value": "6dab935dc112ea9dbdf0a7539695c377"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "=data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "fda36144-0fe9-4548-bed7-823adca0e5ec",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "eaLLqEdwioGllkwf",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fileSelector": "/home/node/新百度网盘发票.pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "e53264d1-5738-4f3a-93ee-3f4ae07e299b",
+      "name": "ReadFile"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "product[0]",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        848,
+        0
+      ],
+      "id": "d28b2d3a-e88b-4883-97a8-eb86a10130c9",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef13549c-e41e-425e-8a09-0f9daf3b42f4",
+              "name": "product",
+              "value": "={{ $json.pages[0].result.object_list[0].product_list }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "564a3961-935b-4409-8ba6-6672dd74a8c3",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "content": "# 自动简历筛选器\n# author：tigerAI\n# 公众号：老虎聊AI\n# 视频号：老虎聊AI\n# description： \n## 读取本地目录中的发票文件，通过http request节点调用第三方API的方式实现读取发票中的信息\n",
+        "height": 480,
+        "width": 640
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -512
+      ],
+      "id": "6b042727-08cc-4e42-b877-99756b02c26a",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "ReadFile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ReadFile": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "adbe7fd3-3cac-4215-94e0-378d08d0da15",
+  "meta": {
+    "instanceId": "3a9f1808fd9411cdad9f0600c716c707a044601d01fa7c58b647a22ed7dd15bf"
+  },
+  "id": "b54bEYMqC43irz6a",
+  "tags": [
+    {
+      "createdAt": "2025-08-28T09:51:27.976Z",
+      "updatedAt": "2025-08-28T09:51:46.990Z",
+      "id": "Z3UYalwJzVB8nUsy",
+      "name": "小报童案例"
+    }
+  ]
+}
