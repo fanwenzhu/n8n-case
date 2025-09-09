@@ -1,0 +1,300 @@
+{
+  "name": "自动新闻日报（完成）",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 18
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        -240
+      ],
+      "id": "d6770bec-e534-41fd-b02d-90ec6d4bcbb0",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://rss.eastmoney.com/rss_partener.xml",
+        "options": {
+          "ignoreSSL": false
+        }
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -256,
+        -240
+      ],
+      "id": "af0852c7-c58b-4e89-a15a-3c973ac63bbf",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{$json.data}}",
+        "options": {
+          "systemMessage": "你是一个新闻助手，我需要你把从网站上爬取的数据，整理成一个新闻简报。",
+          "passthroughBinaryImages": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        416,
+        -240
+      ],
+      "id": "c008860e-8194-4f2d-84b9-fa133ea26238",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "deepseek-r1-distill-qwen-14b",
+          "mode": "list",
+          "cachedResultName": "deepseek-r1-distill-qwen-14b"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        -16
+      ],
+      "id": "8d0c1b80-714f-4371-8ae1-8b04d9feefaf",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "i1nyBSnKjPaZiKdz",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "output"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        816,
+        -240
+      ],
+      "id": "6c2ea2a5-7295-46bc-a359-5f5843e66edb",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.output.join(\"\\n\\n\") }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        -240
+      ],
+      "id": "eb098c7a-85b6-4bcd-b619-756889007b8b",
+      "name": "Markdown"
+    },
+    {
+      "parameters": {
+        "fromEmail": "345220094@qq.com",
+        "toEmail": "345220094@qq.com",
+        "subject": "={{$now.format('DD')}} 新闻",
+        "html": "={{ $json.data }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1264,
+        -240
+      ],
+      "id": "8fea06de-a7d6-447c-b734-a07d29a46873",
+      "name": "Send email",
+      "webhookId": "9a52a586-0efe-44a5-95e9-744367692de3",
+      "credentials": {
+        "smtp": {
+          "id": "Jn2mxz1bUinowsbK",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "maxItems": 5
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        -240
+      ],
+      "id": "e31e0228-d72f-43f8-85b3-91a3e4c485c5",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "operation": "scrape",
+        "url": "={{ $json.link }}",
+        "requestOptions": {}
+      },
+      "type": "@mendable/n8n-nodes-firecrawl.firecrawl",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -240
+      ],
+      "id": "0254a41d-ff05-42c7-a1c3-e01f33f07f8f",
+      "name": "Scrape a url and get its content",
+      "credentials": {
+        "firecrawlApi": {
+          "id": "MqCxvetMEiuTqNpz",
+          "name": "Firecrawl account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# 自动简历筛选器\n# author：tigerAI\n# 公众号：老虎聊AI\n# 视频号：老虎聊AI\n# description： \n## 自动提取RSS新闻源的内容，整理成新闻日报并通过邮件发送到我的邮箱",
+        "height": 400,
+        "width": 640
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        -720
+      ],
+      "id": "cc2ec72d-2a8f-457a-9d86-03a972b9f41a",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Scrape a url and get its content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape a url and get its content": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "df850bf8-4b2b-4f80-a792-f472b54a5485",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3a9f1808fd9411cdad9f0600c716c707a044601d01fa7c58b647a22ed7dd15bf"
+  },
+  "id": "nKNp1z8tGts9fbC5",
+  "tags": [
+    {
+      "createdAt": "2025-08-28T09:51:27.976Z",
+      "updatedAt": "2025-08-28T09:51:46.990Z",
+      "id": "Z3UYalwJzVB8nUsy",
+      "name": "小报童案例"
+    }
+  ]
+}
