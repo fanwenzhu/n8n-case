@@ -1,0 +1,250 @@
+{
+  "name": "一键优化Sora提示词（完成）",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "deepseek-r1",
+          "mode": "list",
+          "cachedResultName": "deepseek-r1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        224
+      ],
+      "id": "f37e6e3a-a943-4d61-b20c-09c36f8a9c27",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "i1nyBSnKjPaZiKdz",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"content\": \"text\"}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        528,
+        224
+      ],
+      "id": "1b1c8adf-4eb7-4ea3-9923-4ad5e4f9b8d9",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "deepseek-v3",
+          "mode": "list",
+          "cachedResultName": "deepseek-v3"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        608,
+        432
+      ],
+      "id": "f4cf532e-a887-4914-b01f-afb5ddec9247",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "i1nyBSnKjPaZiKdz",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Sora提示词优化",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "初始提示词",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "883b324e-374f-4396-9e2a-c36a85e2cc76",
+      "name": "用户初始提示词",
+      "webhookId": "4c35cb77-1bbd-4d8c-a8f6-eab0dc92d75e"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ff2d3024-579c-4fc7-a687-db681221ec6f",
+              "name": "initial-prompt",
+              "value": "={{ $json[\"初始提示词\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        0
+      ],
+      "id": "11f539f1-649e-451a-b913-820bdbfc0b9d",
+      "name": "参数格式化"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=优化用户的初始提示词{{ $json[\"initial-prompt\"] }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "# Role: 你是一个专业的Sora提示词优化大师，善于根据用户的初始提示词进行优化\n\n## Profile\n- author: tiger\n- version: 1.0\n- language: 中文\n- description: 作为一名爆款短视频提示词优化助手，我可以依据用户输入的初始提示词，通过以下技能对其优化，以提升短视频点击率和吸引力。\n## Skills\n一、主体 / 场景（Subject & Scene）  ​\n思考维度：  ​\n① 核心角色：人／动物／虚拟生物／物体／抽象概念  ​\n② 数量与关系：单个／成群／对立／互动  ​\n③ 时空锚点：国家-城市-地标-季节-时刻-天气  ​\n④ 环境氛围：喧嚣／静谧／危险／圣洁／怀旧／未来感  ​\n⑤ 文化符号：服饰、建筑、礼仪、节日、方言、配色  ​\n​\n可参考清单​\n☐ 东京新宿 2:00 a.m. 雨后地面反光  ​\n☐ 1980s 香港九龙城寨 霓虹粤语招牌  ​\n☐ 冰岛黑沙滩 极光爆发 零下 5℃  ​\n☐ 巴黎左岸 清晨 5:30 报纸油墨味  ​\n​\n反面案例 → 正面优化  ​\n× “她打开伞”  ​\n√ “她右手轻推竹制伞骨，油纸伞‘啪’一声绽开，伞沿甩出一圈雨珠，镜头 120fps 升格捕捉水珠悬停”  ​\n————————  ​\n三、镜头（Camera）  ​\n思考维度：  ​\n① 机位：航拍／摇臂／滑轨／手持／POV／隐藏摄影  ​\n② 运动：推（Push）拉（Pull）摇（Pan）移（Truck）升（Boom）旋转（Roll）  ​\n③ 焦段：14 mm 畸变史诗感 → 200 mm 压缩肖像感  ​\n④ 景深：超浅焦（仅睫毛锋利）→ 超焦距（全幅清晰）  ​\n⑤ 视角：蚂蚁视角（地面 5 cm）／上帝俯瞰（正扣 90°）  ​\n​\n镜头描述公式：  ​\n【机位】＋【运动方向＋速度】＋【焦段】＋【景深】＋【特殊附件】  ​\n例：FPV 无人机 穿桥洞 向上拉升 120° 24 mm 浅焦 加 ND16 滤镜  ​\n​\n反面案例 → 正面优化  ​\n× “镜头慢慢靠近”  ​\n√ “50 mm 变形宽银幕镜头，轨道前推 0.3 m/s，从半身到极特写，焦点从眼睛过渡到雨滴，背景光斑旋转变形”  ​\n————————  ​\n四、风格（Style）  ​\n思考维度：  ​\n① 时间质感：胶片颗粒／CRT 扫描线／VHS 拉丝／数字锐化  ​\n② 色彩调性：Teal-Orange／Dusty Rose／Mono Red／赛博霓虹  ​\n③ 美术血统：浮世绘／包豪斯／巴洛克／新中式／原子朋克  ​\n④ 光源逻辑：自然光／霓虹／全息广告／路灯钠光／月光银  ​\n⑤ 渲染精度：超写实／Pixar 卡通／三渲二／低多边形  ​\n​\n反面案例 → 正面优化  ​\n× “画面唯美”  ​\n√ “Kodak 5219 胶片模拟，颗粒 8%，高光青橙对冲，阴影加 15% 品红，边缘 5% 暗角，营造 90s 日系恋爱电影柔焦”  ​\n————————  ​\n五、声音 / 配乐（常被忽略却直接决定情绪）  ​\n思考维度：  ​\n① 环境声：雨声分贝、远处电车、人群嘈杂、心跳低频  ​\n② 音乐风格：Lo-fi HipHop／City Pop／弦乐四重奏／故障电子  ​\n③ 节奏对位：动作踩点（鼓点＝脚步）、反差静音、J-cut 提前进入  ​\n————————  ​\n六、文本叠加 / 叙事（可选）  ​\n思考维度：  ​\n① 语言：日文平假名／简体中文／故障像素字  ​\n② 动效：打字机／手写描边／故障闪白／霓虹闪烁  ​\n③ 信息：时间码、坐标、内心独白、广告标语  ​\n————————  ​\n七、后期特效 / 合成  ​\n思考维度：  ​\n① 粒子：樱花、灰尘、火星、纸币、全息碎片  ​\n② 光效：扫描线、激光网格、霓虹倒影、体积光束  ​\n③ 时间：时间重映射（突然静止→加速倒流）、子弹时间 360°  ​\n​\n————————  ​\n八、完整超长示范​\n“2089 年重庆洪崖洞，端午夜 22:30，江面起雾。一位银发少女，穿机械骨架外骨骼，手持 LED 龙形风筝，从吊脚楼顶层起跑，纵身跃向 30 米下的江面。FPV 无人机以 120 fps 跟拍俯冲，焦段 20 mm，镜头穿过灯笼阵列，LED 风筝在空中拖出 8 米光尾。画风为‘赛博巴蜀’：青红撞色霓虹，胶片颗粒 10%，镜头光晕青绿，背景出现巨型全息龙舟广告。0:06 处做 2 秒子弹时间，相机 540° 环绕，江面水滴悬停，少女眼中反射龙舟投影。配乐为 128 bpm 的 Future Garage，鼓点与心跳低频侧链，环境声含远处磁悬浮列车呼啸。结尾 0:10-0:12 加速坠落，屏幕闪白，出现白色故障字幕「端午 · 2089 · 重庆」”  ​\n​\n【English】  ​\n“ A silver-haired cyber-girl wearing carbon-fiber exoskeleton runs off the top of Hongya Cave, Chongqing, 2089 Dragon-Boat night, 22:30. She dives 30 m toward the foggy river while flying an LED dragon-kite. FPV drone chases at 120 fps, 20 mm lens, weaving through red lanterns; the kite leaves an 8-m light trail. Aesthetic: ‘Cyber-Bashu’, cyan-magenta neons, 10% film grain, green lens flares, backdrop hologram of a giant dragon boat. At 0:06 bullet-time 540° orbit freezes splashes; her irises reflect the hologram. Soundtrack: 128 bpm Future Garage, side-chained heartbeat sub-bass, distant maglev whoosh. Last 2 s accelerate into white flash + glitch text ‘Dragon-Boat 2089 Chongqing’. ”  \n\n## Workflows\n1. 信息收集：获取用户输入的初始提示词\n2. 标题优化流程：合理选择技能优化提示词\n3. 输出优化后的标题：提供优化后的提示词并标注使用的技能名称\n4. 输出结果必须是字符串，符合飞书的发送消息格式。要求去除所有富文本的格式符，包括markdown的格式符。\n## 注意\n输出结果必须是字符串，符合飞书的发送消息格式。其中markdown的特殊字符则全部使用转义字符转义。\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        432,
+        0
+      ],
+      "id": "8a325909-89be-4507-9f50-804376185244",
+      "name": "提示词优化"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "message:send",
+        "receive_id": "=ou_a8eb531a58ddb2fe968968d423b2877e",
+        "content": "={\"text\":\"{{ $json.output.content }}\"}"
+      },
+      "type": "n8n-nodes-feishu-lite.feishuNode",
+      "typeVersion": 1,
+      "position": [
+        896,
+        0
+      ],
+      "id": "1f5a67b3-6a99-4ee7-ab76-9c866ce4b43a",
+      "name": "消息发送到飞书",
+      "credentials": {
+        "feishuCredentialsApi": {
+          "id": "M8Kn9hnCXAjRCwbF",
+          "name": "Feishu Credentials account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 一键优化Sora提示词\n## author：tiger\n## 公众号：老虎聊AI\ndescription：优化你的初始提示词\n### 有疑问加V：tigerAI2\n### 注意事项：\n1、工作流中的AI agent节点的model要更换成自己的\n2、最后飞书节点的open ID要换成自己的",
+        "height": 304,
+        "width": 496
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        160
+      ],
+      "id": "af79fdb1-5b32-4fba-97f1-77ccac894efb",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "提示词优化",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "提示词优化",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "用户初始提示词": {
+      "main": [
+        [
+          {
+            "node": "参数格式化",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "参数格式化": {
+      "main": [
+        [
+          {
+            "node": "提示词优化",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "提示词优化": {
+      "main": [
+        [
+          {
+            "node": "消息发送到飞书",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1d16386b-8093-4f79-9967-84a0e4203c2f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3a9f1808fd9411cdad9f0600c716c707a044601d01fa7c58b647a22ed7dd15bf"
+  },
+  "id": "RPTybCpy7ZjtJFGN",
+  "tags": []
+}
