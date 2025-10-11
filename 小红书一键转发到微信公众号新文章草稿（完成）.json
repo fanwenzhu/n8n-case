@@ -1,0 +1,659 @@
+{
+  "name": "小红书一键转发到微信公众号新文章草稿（完成）",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "小红书登录",
+        "options": {
+          "buttonLabel": "获取登陆二维码",
+          "ignoreBots": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -304,
+        32
+      ],
+      "id": "a368cd55-e3a7-4fbb-8bf0-7af1cbacc64d",
+      "name": "On form submission",
+      "webhookId": "2ab2fca5-abc8-47aa-99eb-5545c9de5e41"
+    },
+    {
+      "parameters": {
+        "options": {
+          "formDescription": "=<img\n  src=\"{{ $json.data.qrCodeUrl }}\"\n  width=\"80%\"\n  style=\"border:1px solid #ccc\"\n/>\n<div>请扫描二维码再点击下一步</div>",
+          "buttonLabel": "下一步"
+        }
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        144,
+        32
+      ],
+      "id": "f0275546-340b-4e0e-a314-713fd9cdd1b6",
+      "name": "Form",
+      "webhookId": "d3481c5a-9f60-4a31-ad14-095ef8947086"
+    },
+    {
+      "parameters": {
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "需要转发的小红书笔记链接",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        592,
+        32
+      ],
+      "id": "a0693cc7-0895-43c8-b309-724566534da4",
+      "name": "登陆提示",
+      "webhookId": "35284175-a5f7-4cd1-a471-b4ab222aeb25"
+    },
+    {
+      "parameters": {
+        "resource": "auth",
+        "requestOptions": {}
+      },
+      "type": "@donney521/n8n-nodes-xiaohongshu.xiaohongshu",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        32
+      ],
+      "id": "76d03ab1-fe72-419a-9b22-9b2b86424067",
+      "name": "获取登录二维码",
+      "credentials": {
+        "xiaohongshuApi": {
+          "id": "YhhlGemGx4XxoH2z",
+          "name": "Xiaohongshu account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "auth",
+        "operation": "checkLogin",
+        "requestOptions": {}
+      },
+      "type": "@donney521/n8n-nodes-xiaohongshu.xiaohongshu",
+      "typeVersion": 1,
+      "position": [
+        368,
+        32
+      ],
+      "id": "b0fe82b5-d3ce-49aa-bae4-ddd1aeef4a5c",
+      "name": "二维码登录",
+      "credentials": {
+        "xiaohongshuApi": {
+          "id": "YhhlGemGx4XxoH2z",
+          "name": "Xiaohongshu account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "basicInfo",
+        "noteUrl": "={{ $json['需要转发的小红书笔记链接'] }}",
+        "requestOptions": {}
+      },
+      "type": "@donney521/n8n-nodes-xiaohongshu.xiaohongshu",
+      "typeVersion": 1,
+      "position": [
+        816,
+        32
+      ],
+      "id": "023b93b6-a874-4af8-b166-65341bde9441",
+      "name": "获取要转发的笔记的基础文本信息",
+      "credentials": {
+        "xiaohongshuApi": {
+          "id": "YhhlGemGx4XxoH2z",
+          "name": "Xiaohongshu account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "images",
+        "noteUrl": "={{ $('登陆提示').item.json['需要转发的小红书笔记链接'] }}",
+        "requestOptions": {}
+      },
+      "type": "@donney521/n8n-nodes-xiaohongshu.xiaohongshu",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        32
+      ],
+      "id": "476ae7b0-6208-4793-9289-ee14aa89b6f5",
+      "name": "获取要转发笔记的所有图片资源",
+      "credentials": {
+        "xiaohongshuApi": {
+          "id": "YhhlGemGx4XxoH2z",
+          "name": "Xiaohongshu account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json['图片列表'][0] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1712,
+        -160
+      ],
+      "id": "dcd8bf12-8475-40a3-b36c-8b701df7d0ae",
+      "name": "下载图片"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "445e38b1-e285-4000-82fd-af3c9566b737",
+              "name": "图片列表",
+              "value": "={{ $json.data.images }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1264,
+        32
+      ],
+      "id": "6dc68cf4-4d6d-48fc-a7f3-7aeab6d2870b",
+      "name": "获取所有的图片链接"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5c038c0d-9ae1-4a57-a7b0-9b3c505877ef",
+              "leftValue": "={{ $json['图片列表'].length }}",
+              "rightValue": "1",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1488,
+        32
+      ],
+      "id": "fdbf3321-b2c0-477e-9fbc-c7554495b82f",
+      "name": "判断图片数量是否大于1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "['图片列表']",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1712,
+        224
+      ],
+      "id": "608736b7-ffa4-4d22-a1a9-084e44b96a85",
+      "name": "若图片数量大于1，将所有图片拆分出来"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1936,
+        224
+      ],
+      "id": "a9a78350-6daf-47e1-82da-ea2fc77cc936",
+      "name": "循环每个图片链接"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json['[\\'图片列表\\']'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2160,
+        224
+      ],
+      "id": "42e55bce-8441-4c8d-b61e-a3807c6d278d",
+      "name": "下载图片1"
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "width": null,
+        "height": null,
+        "options": {
+          "fileName": "={{ $('获取要转发的笔记的基础文本信息').item.json.data.title }}.jpeg",
+          "format": "jpeg",
+          "quality": 100
+        }
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        1936,
+        -160
+      ],
+      "id": "70233021-1c86-4151-a547-bdfc9193c553",
+      "name": "转换图片格式"
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "media:uploadOther"
+      },
+      "type": "n8n-nodes-wechat-offiaccount.wechatOfficialAccountNode",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        -160
+      ],
+      "id": "aafdc8aa-7f0e-4734-bd25-80a50b77d43d",
+      "name": "图片上传到微信公众号素材",
+      "credentials": {
+        "wechatOfficialAccountCredentialsApi": {
+          "id": "fQvF89uSkKj1D9Fi",
+          "name": "Wechat Official Account Credentials account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "operation": "draft:add",
+        "articles": "=[\n    {\n      \"title\": \"{{ $('获取要转发的笔记的基础文本信息').item.json.data.title }}\",\n      \"content\": \"{{ $('获取要转发的笔记的基础文本信息').item.json.data.content }}\",\n      \"thumb_media_id\": \"{{ $json.media_id }}\",\n      \"author\": \"老虎聊AI\",\n      \"need_open_comment\": 1\n    }\n  ]"
+      },
+      "type": "n8n-nodes-wechat-offiaccount.wechatOfficialAccountNode",
+      "typeVersion": 1,
+      "position": [
+        2384,
+        -160
+      ],
+      "id": "1997695b-345b-412a-a435-8c4937c9e0a6",
+      "name": "新建草稿",
+      "credentials": {
+        "wechatOfficialAccountCredentialsApi": {
+          "id": "fQvF89uSkKj1D9Fi",
+          "name": "Wechat Official Account Credentials account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "width": {},
+        "height": {},
+        "options": {
+          "fileName": "={{ $('获取要转发的笔记的基础文本信息').item.json.data.title }}-{{ $now }}.jpeg",
+          "format": "jpeg",
+          "quality": 100
+        }
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        2608,
+        224
+      ],
+      "id": "fd141a22-b778-4d53-9438-ddf127e7492e",
+      "name": "转换图片格式1"
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "media:uploadOther"
+      },
+      "type": "n8n-nodes-wechat-offiaccount.wechatOfficialAccountNode",
+      "typeVersion": 1,
+      "position": [
+        2832,
+        304
+      ],
+      "id": "e32c2b94-3a04-4cac-8ef0-dcbde16ddacd",
+      "name": "图片上传到微信公众号素材1",
+      "credentials": {
+        "wechatOfficialAccountCredentialsApi": {
+          "id": "fQvF89uSkKj1D9Fi",
+          "name": "Wechat Official Account Credentials account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2384,
+        224
+      ],
+      "id": "a7cc2cc1-42b0-4ac5-879d-5bdc1d4c2e33",
+      "name": "Wait",
+      "webhookId": "85e93d98-4675-48ce-92c0-49f02e87fdcb"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "operation": "draft:add",
+        "articles": "={{ JSON.stringify($json.articles) }}"
+      },
+      "type": "n8n-nodes-wechat-offiaccount.wechatOfficialAccountNode",
+      "typeVersion": 1,
+      "position": [
+        2384,
+        32
+      ],
+      "id": "c1ffffb3-fd68-4d4c-b746-4ff9d37e51c9",
+      "name": "Draft:add draft",
+      "credentials": {
+        "wechatOfficialAccountCredentialsApi": {
+          "id": "fQvF89uSkKj1D9Fi",
+          "name": "Wechat Official Account Credentials account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 该代码在 n8n 的 \"Code\" 节点中运行。\n// 它的作用是收集上游节点传入的所有图片信息（media_id 和 url），\n// 并将它们格式化成一篇微信图文草稿所需要的数据结构。\nconst noteNodeData = $('获取要转发的笔记的基础文本信息');\n// 从该节点的数据中提取标题和作者。根据您的截图，路径是 .json.data.title 和 .json.data.author\nconst noteTitle = noteNodeData.first().json.data.title;\n\n// 1. 检查是否有输入数据，如果没有则返回一个空对象，避免后续节点出错。\nif (items.length === 0) {\n  return [{ json: {} }];\n}\n\n// 2. 初始化一个空字符串，用于拼接HTML内容。\nlet htmlContent = '';\n\n// 3. 遍历所有输入的item，每个item都包含了单张上传后的图片信息。\nfor (const item of items) {\n  // 根据您的截图，上传后的图片URL存放在 item.json.url 中。\n  // 如果您的数据结构不同，请修改这里的路径。\n  const imageUrl = item.json.url;\n\n  // 确保URL存在，然后创建一个<img>标签并拼接到htmlContent中。\n  if (imageUrl) {\n    // 将每个图片包裹在<p>标签中，可以在图文消息中实现自动换行和间距。\n    htmlContent += `<p><img src=\"${imageUrl}\" /></p>`;\n  }\n}\n\n// 4. 获取封面图片的 media_id。\n// 我们默认使用第一张上传的图片作为封面。\n// 根据您的截图，media_id 存放在 item.json.media_id 中。\nconst thumbMediaId = items[0].json.media_id;\n\n// 5. 构建 \"新建草稿\" 节点所需要的 \"articles\" 对象结构。\nconst draftData = {\n  articles: [\n    {\n      // ---请根据您的需求修改以下内容---\n      title: noteTitle, // 草稿的标题\n      author: \"老虎聊AI\", // 作者名\n      // ---以下内容通常无需修改---\n      thumb_media_id: thumbMediaId, // 封面图片的 media_id\n      content: htmlContent, // 包含所有图片的HTML正文内容\n      need_open_comment: 1, // 1 表示开启评论\n      only_fans_can_comment: 0 // 0 表示所有人可评论\n    }\n    // 如果您需要发布多图文消息，可以在这里添加更多文章对象。\n    // { title: \"第二篇文章\", ... },\n  ]\n};\n\n// 6. 返回一个包含已构建好的草稿数据的 item。\n// 这个输出可以直接连接到 \"n8n-nodes-wechat-offiaccount\" 的 \"新建草稿\" 节点。\nreturn [{\n  json: draftData\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        32
+      ],
+      "id": "a1d5fab0-ae49-4bac-975a-02de902f6cb5",
+      "name": "聚合所有图片和文本"
+    },
+    {
+      "parameters": {
+        "content": "## 小红书一键转发笔记到微信公众号文章草稿\n## author：tiger\n## 公众号：老虎聊AI\n### description：只需输入要转发的小红书笔记的URL，此工作流就能自动将笔记转发到公众号文章草稿中。\n### 注意事项：\n1、需要安装https://www.npmjs.com/package/@donney521/n8n-nodes-xiaohongshu和https://www.npmjs.com/package/n8n-nodes-wechat-offiaccount\n",
+        "height": 432,
+        "width": 496
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        208,
+        256
+      ],
+      "id": "ddc2c3b8-e29f-41fa-8e7d-9a54b42012f5",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "获取登录二维码",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "获取登录二维码": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Form": {
+      "main": [
+        [
+          {
+            "node": "二维码登录",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "二维码登录": {
+      "main": [
+        [
+          {
+            "node": "登陆提示",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "登陆提示": {
+      "main": [
+        [
+          {
+            "node": "获取要转发的笔记的基础文本信息",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "获取要转发的笔记的基础文本信息": {
+      "main": [
+        [
+          {
+            "node": "获取要转发笔记的所有图片资源",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "下载图片": {
+      "main": [
+        [
+          {
+            "node": "转换图片格式",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "获取要转发笔记的所有图片资源": {
+      "main": [
+        [
+          {
+            "node": "获取所有的图片链接",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "获取所有的图片链接": {
+      "main": [
+        [
+          {
+            "node": "判断图片数量是否大于1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "判断图片数量是否大于1": {
+      "main": [
+        [
+          {
+            "node": "下载图片",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "若图片数量大于1，将所有图片拆分出来",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "若图片数量大于1，将所有图片拆分出来": {
+      "main": [
+        [
+          {
+            "node": "循环每个图片链接",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "循环每个图片链接": {
+      "main": [
+        [
+          {
+            "node": "聚合所有图片和文本",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "下载图片1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "下载图片1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "转换图片格式": {
+      "main": [
+        [
+          {
+            "node": "图片上传到微信公众号素材",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "图片上传到微信公众号素材": {
+      "main": [
+        [
+          {
+            "node": "新建草稿",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "转换图片格式1": {
+      "main": [
+        [
+          {
+            "node": "图片上传到微信公众号素材1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "图片上传到微信公众号素材1": {
+      "main": [
+        [
+          {
+            "node": "循环每个图片链接",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "转换图片格式1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "聚合所有图片和文本": {
+      "main": [
+        [
+          {
+            "node": "Draft:add draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1e00158f-9f22-4e61-a6c8-150739d349d6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3a9f1808fd9411cdad9f0600c716c707a044601d01fa7c58b647a22ed7dd15bf"
+  },
+  "id": "NWp4YlWQiS9IvEVe",
+  "tags": []
+}
